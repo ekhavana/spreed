@@ -133,15 +133,15 @@ class SignalingController extends OCSController {
 		}
 
 		$signaling = '';
-		$servers = $this->talkConfig->getSignalingServers();
-		if (!empty($servers)) {
+		$signalingMode = $this->talkConfig->getSignalingMode();
+		if ($signalingMode !== Config::SIGNALING_INTERNAL) {
+			$servers = $this->talkConfig->getSignalingServers();
 			try {
 				$serverId = random_int(0, count($servers) - 1);
 			} catch (\Exception $e) {
 				$serverId = 0;
 			}
-			$signalingClusterMode = $this->serverConfig->getAppValue('spreed', 'hpb_cluster_mode', '');
-			if ($signalingClusterMode === 'conversation') {
+			if ($signalingMode === Config::SIGNALING_CLUSTER_CONVERSATION) {
 				try {
 					$serverId = $this->getSignalingServerForConversation($this->userId, $serverId, $token);
 				} catch (RoomNotFoundException $e) {
@@ -193,8 +193,7 @@ class SignalingController extends OCSController {
 	 * @return DataResponse
 	 */
 	public function signaling(string $token, string $messages): DataResponse {
-		$signaling = $this->talkConfig->getSignalingServers();
-		if (!empty($signaling)) {
+		if ($this->talkConfig->getSignalingMode() !== Config::SIGNALING_INTERNAL) {
 			return new DataResponse('Internal signaling disabled.', Http::STATUS_BAD_REQUEST);
 		}
 
@@ -239,8 +238,7 @@ class SignalingController extends OCSController {
 	 * @return DataResponse
 	 */
 	public function pullMessages(string $token): DataResponse {
-		$signaling = $this->talkConfig->getSignalingServers();
-		if (!empty($signaling)) {
+		if ($this->talkConfig->getSignalingMode() !== Config::SIGNALING_INTERNAL) {
 			return new DataResponse('Internal signaling disabled.', Http::STATUS_BAD_REQUEST);
 		}
 
