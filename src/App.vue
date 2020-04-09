@@ -50,7 +50,10 @@ import {
 	leaveConversationSync,
 } from './services/participantsService'
 import { PARTICIPANT } from './constants'
-import { getSignalingSync } from './utils/webrtc/index'
+import {
+	signalingPrepareUnload,
+	signalingKill
+} from './utils/webrtc/index'
 import { emit } from '@nextcloud/event-bus'
 import browserCheck from './mixins/browserCheck'
 
@@ -189,10 +192,7 @@ export default {
 
 		window.addEventListener('beforeunload', () => {
 			console.info('Stop potential reconnects on unload')
-			const signaling = getSignalingSync()
-			if (signaling) {
-				signaling.prepareUnloading()
-			}
+			signalingPrepareUnload()
 		})
 
 		window.addEventListener('unload', () => {
@@ -200,10 +200,7 @@ export default {
 			if (this.token) {
 				// We have to do this synchronously, because in unload and beforeunload
 				// Promises, async and await are prohibited.
-				const signaling = getSignalingSync()
-				if (signaling) {
-					signaling.disconnect()
-				}
+				signalingKill()
 				leaveConversationSync(this.token)
 			}
 		})

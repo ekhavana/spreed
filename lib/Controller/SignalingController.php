@@ -152,6 +152,7 @@ class SignalingController extends OCSController {
 		}
 
 		return new DataResponse([
+			'signalingMode' => $signalingMode,
 			'userId' => $this->userId,
 			'hideWarning' => $signaling !== '' || $this->talkConfig->getHideSignalingWarning(),
 			'server' => $signaling,
