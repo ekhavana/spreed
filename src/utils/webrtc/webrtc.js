@@ -647,6 +647,7 @@ export default function initWebRTC(signaling, _callParticipantCollection) {
 			peer.pc.getStats(track).then(function(stats) {
 				let result = false
 				stats.forEach(function(statsReport) {
+					console.debug('statsReport', statsReport)
 					if (result || statsReport.mediaType !== mediaType || !statsReport.hasOwnProperty('bytesReceived')) {
 						return
 					}
@@ -662,7 +663,7 @@ export default function initWebRTC(signaling, _callParticipantCollection) {
 				if (result) {
 					resolve()
 				} else {
-					reject(new Error())
+					reject(new Error('No bytes received'))
 				}
 			})
 		})
